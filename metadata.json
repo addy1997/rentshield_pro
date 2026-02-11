@@ -1,0 +1,8 @@
+{
+  "name": "RentShield 2026",
+  "description": "Your AI Legal Guardian for the UK Renters' Rights Act 2026. Protect your tenancy, track hazards, and fight bidding wars.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

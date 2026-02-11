@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#1A1A1A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/929/929430.png" />
+    <title>RentShield 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              'neone-red': '#FF4D4D',
+              'neone-blue': '#00D1FF',
+              'neone-yellow': '#FFD166',
+              'neone-green': '#06D6A0',
+              'neone-dark': '#1A1A1A',
+            },
+            boxShadow: {
+              'neu': '4px 4px 0px 0px rgba(0,0,0,1)',
+              'neu-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+              'neu-white': '4px 4px 0px 0px rgba(255,255,255,1)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100dvh;
+        overflow: hidden; /* Prevent body scroll, handle in app container */
+      }
+      .dark body {
+        background-color: #111;
+      }
+      
+      #root {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Hide scrollbar for clean mobile look */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Accessibility Mode Styles */
+      html.large-text {
+        font-size: 125%;
+      }
+      
+      .high-contrast {
+        --tw-text-opacity: 1 !important;
+      }
+      .high-contrast .bg-white, .high-contrast .bg-gray-50, .high-contrast .bg-gray-100 { background-color: #ffffff !important; border: 2px solid #000 !important; }
+      .high-contrast .text-gray-500, .high-contrast .text-gray-400 { color: #000000 !important; font-weight: 700 !important; }
+      .high-contrast.dark .bg-black, .high-contrast.dark .bg-gray-900, .high-contrast.dark .bg-gray-800 { background-color: #000000 !important; border: 2px solid #fff !important; }
+      .high-contrast.dark .text-gray-400, .high-contrast.dark .text-gray-300 { color: #ffffff !important; font-weight: 700 !important; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "date-fns": "https://esm.sh/date-fns@^4.1.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.33.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

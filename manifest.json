@@ -1,0 +1,17 @@
+{
+  "name": "RentShield 2026",
+  "short_name": "RentShield",
+  "description": "AI Legal Guardian for UK Tenants",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A1A",
+  "theme_color": "#00D1FF",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/929/929430.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
