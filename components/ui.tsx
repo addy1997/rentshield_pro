@@ -1,8 +1,8 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import { Loader2, Info } from 'lucide-react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   isLoading?: boolean;
 }
@@ -23,8 +23,10 @@ export const NeuButton: React.FC<ButtonProps> = ({ children, variant = 'primary'
       className={`${baseStyle} ${variants[variant]} ${className || ''}`}
       {...props}
     >
-      {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-      {children}
+      <>
+        {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {children}
+      </>
     </motion.button>
   );
 };

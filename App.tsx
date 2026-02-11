@@ -6,6 +6,15 @@ import { NeuButton, SoftCard, NeuAlert, TooltipIcon } from './components/ui';
 import { AppTab, Hazard, Tone, ScanHistoryItem } from './types';
 import { format, addDays, differenceInDays } from 'date-fns';
 
+// --- Types ---
+
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+  age: string;
+  mobile: string;
+}
+
 // --- Shared Components ---
 
 const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
@@ -31,32 +40,87 @@ const AnimatedLogo = () => (
   </motion.div>
 );
 
-// --- Login & Onboarding Views ---
+// --- Registration View ---
 
-const LoginView = ({ onLogin }: { onLogin: () => void }) => {
+const RegisterView = ({ onRegister }: { onRegister: (user: UserProfile) => void }) => {
+  const [formData, setFormData] = useState<UserProfile>({
+    firstName: '',
+    lastName: '',
+    age: '',
+    mobile: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.firstName && formData.lastName && formData.age && formData.mobile) {
+      onRegister(formData);
+    }
+  };
+
   return (
     <div className="h-full bg-white dark:bg-black flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,209,255,0.1),transparent_50%)]" />
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-xs w-full space-y-10 relative z-10"
+        className="max-w-xs w-full space-y-8 relative z-10"
       >
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-24 h-24 bg-black dark:bg-white rounded-[2rem] flex items-center justify-center shadow-2xl shadow-neone-blue/20">
-            <Shield size={48} className="text-white dark:text-black" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-20 h-20 bg-black dark:bg-white rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-neone-blue/20 mb-2">
+            <Shield size={40} className="text-white dark:text-black" />
           </div>
-          <div className="space-y-2">
-            <h1 className="text-4xl font-display font-bold tracking-tight">Rent<span className="text-neone-blue">Shield</span></h1>
-            <p className="text-gray-500 font-medium">Your AI Legal Guardian</p>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-display font-bold tracking-tight">Create Profile</h1>
+            <p className="text-gray-500 text-sm font-medium">Your Tenant Protection Shield</p>
           </div>
         </div>
-        <div className="space-y-4">
-          <NeuButton className="w-full py-4 text-lg" onClick={onLogin}>Access My Rights</NeuButton>
-          <div className="flex items-center justify-center gap-2 text-gray-400">
-             <Fingerprint size={16} />
-             <p className="text-[10px] font-bold uppercase tracking-widest">Biometric Security Active</p>
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="flex gap-3">
+            <input 
+              type="text" 
+              placeholder="First Name"
+              required
+              value={formData.firstName}
+              onChange={e => setFormData({...formData, firstName: e.target.value})}
+              className="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-neone-blue outline-none transition-all placeholder:text-gray-400 font-medium text-sm"
+            />
+            <input 
+              type="text" 
+              placeholder="Last Name"
+              required
+              value={formData.lastName}
+              onChange={e => setFormData({...formData, lastName: e.target.value})}
+              className="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-neone-blue outline-none transition-all placeholder:text-gray-400 font-medium text-sm"
+            />
           </div>
+          <input 
+            type="number" 
+            placeholder="Age"
+            required
+            min="18"
+            max="120"
+            value={formData.age}
+            onChange={e => setFormData({...formData, age: e.target.value})}
+            className="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-neone-blue outline-none transition-all placeholder:text-gray-400 font-medium text-sm"
+          />
+          <input 
+            type="tel" 
+            placeholder="Mobile Number"
+            required
+            value={formData.mobile}
+            onChange={e => setFormData({...formData, mobile: e.target.value})}
+            className="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-neone-blue outline-none transition-all placeholder:text-gray-400 font-medium text-sm"
+          />
+          
+          <div className="pt-2">
+            <NeuButton type="submit" className="w-full py-3.5 text-base">Secure My Account</NeuButton>
+          </div>
+        </form>
+
+        <div className="flex items-center justify-center gap-2 text-gray-400">
+           <Lock size={12} />
+           <p className="text-[10px] font-bold uppercase tracking-widest">Encrypted Local Storage</p>
         </div>
       </motion.div>
     </div>
@@ -135,13 +199,24 @@ const ScannerView = ({ onSaveHistory, history }: { onSaveHistory: (item: ScanHis
   const [mode, setMode] = useState<'contract' | 'bidding' | 'epc'>('contract');
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+        setPendingFile(file);
+        e.target.value = ''; // Reset input to allow re-selection of same file
+    }
+  };
+
+  const confirmUpload = async () => {
+    if (!pendingFile) return;
     setScanning(true);
     setResult(null);
+    const file = pendingFile;
+    setPendingFile(null);
+
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64 = (reader.result as string).split(',')[1];
@@ -174,7 +249,7 @@ const ScannerView = ({ onSaveHistory, history }: { onSaveHistory: (item: ScanHis
       
       <div className="grid grid-cols-3 gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-xl">
         {(['contract', 'bidding', 'epc'] as const).map(m => (
-          <button key={m} onClick={() => { setMode(m); setResult(null); }} className={`py-2.5 text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all flex items-center justify-center ${mode === m ? 'bg-white dark:bg-gray-800 shadow-sm text-black dark:text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+          <button key={m} onClick={() => { setMode(m); setResult(null); setPendingFile(null); }} className={`py-2.5 text-[10px] font-bold rounded-lg uppercase tracking-wider transition-all flex items-center justify-center ${mode === m ? 'bg-white dark:bg-gray-800 shadow-sm text-black dark:text-white' : 'text-gray-400 hover:text-gray-600'}`}>
             {m}
           </button>
         ))}
@@ -211,6 +286,22 @@ const ScannerView = ({ onSaveHistory, history }: { onSaveHistory: (item: ScanHis
              )}
              <NeuButton className="w-full" onClick={() => setResult(null)}>Scan Another Document</NeuButton>
           </div>
+        ) : pendingFile ? (
+          <div className="text-center z-10 space-y-4 animate-in fade-in zoom-in duration-300 p-6 w-full">
+              <div className="w-16 h-16 bg-neone-blue/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                 <FileCheck size={32} className="text-neone-blue" />
+              </div>
+              <h3 className="font-bold text-lg">Confirm Analysis</h3>
+              <p className="text-sm text-gray-500">Are you sure you want to scan this document?</p>
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 max-w-[200px] mx-auto">
+                 <p className="text-xs font-medium truncate">{pendingFile.name}</p>
+                 <p className="text-[10px] text-gray-400">{(pendingFile.size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+              <div className="flex gap-3 justify-center pt-2">
+                 <NeuButton variant="ghost" onClick={() => setPendingFile(null)} className="h-10 px-4">Cancel</NeuButton>
+                 <NeuButton onClick={confirmUpload} className="h-10 px-4">Yes, Scan</NeuButton>
+              </div>
+          </div>
         ) : (
           <div className="text-center z-10">
             <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg mb-6 mx-auto">
@@ -220,7 +311,7 @@ const ScannerView = ({ onSaveHistory, history }: { onSaveHistory: (item: ScanHis
               Upload a clear photo of your {mode} to analyze your rights instantly.
             </p>
             <NeuButton onClick={() => fileInputRef.current?.click()}><Upload className="mr-2" size={18} /> Upload Image</NeuButton>
-            <input ref={fileInputRef} type="file" className="hidden" onChange={handleUpload} />
+            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
           </div>
         )}
       </div>
@@ -399,7 +490,7 @@ const RightsView = () => {
 
 // --- Profile View ---
 
-const ProfileView = ({ onLogout, darkMode, toggleDarkMode, accessibility, setAccessibility, notifications, setNotifications, privacy, setPrivacy }: any) => {
+const ProfileView = ({ user, onLogout, darkMode, toggleDarkMode, accessibility, setAccessibility, notifications, setNotifications, privacy, setPrivacy }: any) => {
   const [section, setSection] = useState<'main' | 'notifications' | 'privacy' | 'accessibility' | 'help' | 'feedback'>('main');
 
   const ProfileRow = ({ icon: Icon, label, subLabel, onClick, color = "text-gray-500", rightElement, href }: any) => {
@@ -440,11 +531,7 @@ const ProfileView = ({ onLogout, darkMode, toggleDarkMode, accessibility, setAcc
           <User className="text-black dark:text-white" size={32} />
         </div>
         <div>
-          <h2 className="text-2xl font-display font-bold">Adwait</h2>
-          <div className="flex items-center gap-1 text-xs text-gray-500 font-medium">
-             <MapPin size={10} />
-             Hackney, London
-          </div>
+          <h2 className="text-2xl font-display font-bold">{user.firstName} {user.lastName}</h2>
           <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md text-[10px] font-bold uppercase tracking-wider">
              <ShieldCheck size={10} /> Tenant Protected
           </div>
@@ -553,6 +640,7 @@ const ProfileView = ({ onLogout, darkMode, toggleDarkMode, accessibility, setAcc
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.OVERVIEW);
   const [darkMode, setDarkMode] = useState(false);
   const [accessibility, setAccessibility] = useState({ highContrast: false, largeText: false });
@@ -561,6 +649,20 @@ export default function App() {
   const [hazards, setHazards] = useState<Hazard[]>([]);
   const [history, setHistory] = useState<ScanHistoryItem[]>([]);
   const [locationName, setLocationName] = useState('Locating...');
+
+  useEffect(() => {
+    // Check for stored user
+    const storedUser = localStorage.getItem('rentshield_user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (darkMode) document.documentElement.classList.add('dark');
@@ -594,11 +696,23 @@ export default function App() {
     }
   }, [isAuthenticated]);
 
+  const handleRegister = (newUser: UserProfile) => {
+    localStorage.setItem('rentshield_user', JSON.stringify(newUser));
+    setUser(newUser);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('rentshield_user');
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
   return (
     <div className={`h-full w-full flex justify-center bg-gray-100 dark:bg-neutral-900 transition-all duration-300`}>
       {!isAuthenticated ? (
         <main className="w-full h-full max-w-md bg-white dark:bg-black shadow-2xl relative overflow-hidden flex flex-col">
-          <LoginView onLogin={() => setIsAuthenticated(true)} />
+          <RegisterView onRegister={handleRegister} />
         </main>
       ) : (
         <main className="w-full h-full max-w-md bg-white dark:bg-black shadow-2xl relative overflow-hidden flex flex-col">
@@ -617,7 +731,7 @@ export default function App() {
                 {activeTab === AppTab.SCAN && <ScannerView onSaveHistory={(item) => setHistory([item, ...history])} history={history} />}
                 {activeTab === AppTab.TRACKER && <TrackerView hazards={hazards} onAdd={(h) => { setHazards([h, ...hazards]); setActiveTab(AppTab.OVERVIEW); }} />}
                 {activeTab === AppTab.RIGHTS && <RightsView />}
-                {activeTab === AppTab.PROFILE && <ProfileView onLogout={() => setIsAuthenticated(false)} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} accessibility={accessibility} setAccessibility={setAccessibility} notifications={notifications} setNotifications={setNotifications} privacy={privacy} setPrivacy={setPrivacy} />}
+                {activeTab === AppTab.PROFILE && <ProfileView user={user} onLogout={handleLogout} darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} accessibility={accessibility} setAccessibility={setAccessibility} notifications={notifications} setNotifications={setNotifications} privacy={privacy} setPrivacy={setPrivacy} />}
               </motion.div>
             </AnimatePresence>
           </div>
