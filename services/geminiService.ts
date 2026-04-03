@@ -2,9 +2,12 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 export const analyzeContract = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ isSafe: boolean; score: number; summary: string; issues: string[] }> => {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not set. Please add it to your environment variables.");
+    }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3.1-pro-preview',
       contents: {
         parts: [
           {
@@ -52,13 +55,13 @@ export const analyzeContract = async (fileData: string, mimeType: string = 'imag
     const text = response.text;
     if (!text) throw new Error("No response from AI");
     return JSON.parse(text);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Contract analysis failed:", error);
     return {
       isSafe: false,
       score: 0,
-      summary: "Could not analyze document. Please ensure the image is clear.",
-      issues: ["Analysis failed"]
+      summary: error?.message || "Could not analyze document. Please ensure the image is clear.",
+      issues: ["Analysis failed: " + (error?.message || "Unknown error")]
     };
   }
 };
@@ -82,6 +85,9 @@ export const askQuestion = async (question: string): Promise<string> => {
 
 export const analyzeHazard = async (imageBase64: string): Promise<{ type: string; severity: 'Low' | 'Medium' | 'High' | 'Critical'; description: string }> => {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not set. Please add it to your environment variables.");
+    }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -119,18 +125,21 @@ export const analyzeHazard = async (imageBase64: string): Promise<{ type: string
     const text = response.text;
     if (!text) throw new Error("No response from AI");
     return JSON.parse(text);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Hazard analysis failed:", error);
     return {
       type: "Unknown",
       severity: "Medium",
-      description: "AI could not identify the hazard clearly."
+      description: error?.message || "AI could not identify the hazard clearly."
     };
   }
 };
 
 export const detectBiddingWar = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ isIllegal: boolean; evidence: string }> => {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not set. Please add it to your environment variables.");
+    }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -167,17 +176,20 @@ export const detectBiddingWar = async (fileData: string, mimeType: string = 'ima
     const text = response.text;
     if (!text) throw new Error("No response from AI");
     return JSON.parse(text);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Bidding analysis failed:", error);
     return {
       isIllegal: false,
-      evidence: "Could not analyze screenshot."
+      evidence: error?.message || "Could not analyze screenshot."
     };
   }
 };
 
 export const analyzeEPC = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ score: string; comfort: number; compliance: boolean; summary: string }> => {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not set. Please add it to your environment variables.");
+    }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -213,9 +225,9 @@ export const analyzeEPC = async (fileData: string, mimeType: string = 'image/jpe
     const text = response.text;
     if(!text) throw new Error("No response from AI");
     return JSON.parse(text);
-  } catch (error) {
+  } catch (error: any) {
     console.error("EPC analysis failed", error);
-    return { score: '?', comfort: 0, compliance: false, summary: "Analysis failed. Try a clearer image of a window or radiator." };
+    return { score: '?', comfort: 0, compliance: false, summary: error?.message || "Analysis failed. Try a clearer image of a window or radiator." };
   }
 };
 
