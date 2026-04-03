@@ -1,21 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-export const analyzeContract = async (imageBase64: string): Promise<{ isSafe: boolean; score: number; summary: string; issues: string[] }> => {
+export const analyzeContract = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ isSafe: boolean; score: number; summary: string; issues: string[] }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
         parts: [
           {
             inlineData: {
-              mimeType: 'image/jpeg',
-              data: imageBase64
+              mimeType: mimeType,
+              data: fileData
             }
           },
           {
             text: `You are an expert UK housing lawyer in 2026. The Renters' Rights Act 2026 is in effect.
-            Analyze this tenancy agreement image.
+            Analyze this tenancy agreement document.
             
             Determine a 'Tenant Health Score' from 0 to 100.
             - 100 = Perfectly compliant, tenant-friendly.
@@ -63,9 +63,26 @@ export const analyzeContract = async (imageBase64: string): Promise<{ isSafe: bo
   }
 };
 
+export const askQuestion = async (question: string): Promise<string> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `You are an expert UK housing lawyer in 2026. The Renters' Rights Act 2026 is in effect.
+      Answer the following question from a tenant accurately and concisely based on UK housing law.
+      Question: ${question}`,
+    });
+
+    return response.text || "I'm sorry, I couldn't generate an answer.";
+  } catch (error) {
+    console.error("Ask question failed:", error);
+    return "I'm sorry, I couldn't process your question at this time.";
+  }
+};
+
 export const analyzeHazard = async (imageBase64: string): Promise<{ type: string; severity: 'Low' | 'Medium' | 'High' | 'Critical'; description: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
@@ -112,21 +129,21 @@ export const analyzeHazard = async (imageBase64: string): Promise<{ type: string
   }
 };
 
-export const detectBiddingWar = async (imageBase64: string): Promise<{ isIllegal: boolean; evidence: string }> => {
+export const detectBiddingWar = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ isIllegal: boolean; evidence: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           {
             inlineData: {
-              mimeType: 'image/jpeg',
-              data: imageBase64
+              mimeType: mimeType,
+              data: fileData
             }
           },
           {
-            text: `Analyze this screenshot (WhatsApp, Email, or SMS).
+            text: `Analyze this document/screenshot (WhatsApp, Email, or SMS).
             Does this show a landlord or agent encouraging a "Bidding War" (asking for more rent than advertised) or pitting tenants against each other?
             This is illegal under the 2026 Renters' Rights Act.
             Return JSON:
@@ -159,15 +176,15 @@ export const detectBiddingWar = async (imageBase64: string): Promise<{ isIllegal
   }
 };
 
-export const analyzeEPC = async (imageBase64: string): Promise<{ score: string; comfort: number; compliance: boolean; summary: string }> => {
+export const analyzeEPC = async (fileData: string, mimeType: string = 'image/jpeg'): Promise<{ score: string; comfort: number; compliance: boolean; summary: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [
-          { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
-          { text: `Analyze this image of a home interior (radiator, window, insulation) or an EPC document.
+          { inlineData: { mimeType: mimeType, data: fileData } },
+          { text: `Analyze this document or image of a home interior (radiator, window, insulation) or an EPC document.
             Estimate the 'Comfort Level' (0-100) based on visible insulation, glazing, or heating quality.
             Determine if it likely meets the 2026 UK EPC 'C' rating mandate.
             
@@ -204,7 +221,7 @@ export const analyzeEPC = async (imageBase64: string): Promise<{ score: string; 
 
 export const generateResponse = async (tone: string, context: string): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Draft an email response to a landlord in a ${tone} tone.
@@ -221,7 +238,7 @@ export const generateResponse = async (tone: string, context: string): Promise<s
 
 export const analyzeRentIncrease = async (currentRent: number, newRent: number, location: string): Promise<{ isFair: boolean; advice: string; letter: string }> => {
   try {
-     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
      const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `
@@ -261,9 +278,48 @@ export const analyzeRentIncrease = async (currentRent: number, newRent: number, 
   }
 };
 
+export const generateDisputeLetter = async (issue: string, evidence: string, amount: number): Promise<{ advice: string; letter: string }> => {
+  try {
+     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+     const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `
+        Issue: ${issue}.
+        Evidence: ${evidence}.
+        Disputed Amount: £${amount}.
+        
+        Task:
+        1. Give brief advice on how to submit this to the Tenancy Deposit Scheme (TDS).
+        2. Draft a formal dispute letter to the landlord/agency demanding the return of the deposit.
+        
+        Return JSON:
+        {
+          "advice": string,
+          "letter": string
+        }
+      `,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            advice: { type: Type.STRING },
+            letter: { type: Type.STRING }
+          }
+        }
+      }
+     });
+     const text = response.text;
+     if(!text) throw new Error("No response");
+     return JSON.parse(text);
+  } catch (e) {
+     return { advice: "Could not generate advice.", letter: "Error generating letter." };
+  }
+};
+
 export const translateLandlordSpeak = async (text: string): Promise<{ translation: string; legalStanding: string }> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `
@@ -299,14 +355,39 @@ export const translateLandlordSpeak = async (text: string): Promise<{ translatio
 
 export const identifyLocation = async (lat: number, lng: number): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: `I am at latitude ${lat}, longitude ${lng}. 
-      Identify the neighborhood and city (e.g. "Shoreditch, London"). 
-      Return ONLY the location name in a short format, nothing else.`,
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1`, {
+      headers: {
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
     });
-    return response.text?.trim() || "Unknown Area";
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data && data.address) {
+      const neighborhood = data.address.neighbourhood || data.address.suburb || data.address.village || data.address.town || '';
+      const city = data.address.city || data.address.county || data.address.state || '';
+      
+      if (neighborhood && city) {
+        return `${neighborhood}, ${city}`;
+      } else if (city) {
+        return city;
+      } else if (neighborhood) {
+        return neighborhood;
+      } else if (data.display_name) {
+        // Fallback to a shortened version of display_name
+        const parts = data.display_name.split(',');
+        if (parts.length >= 2) {
+          return `${parts[0].trim()}, ${parts[1].trim()}`;
+        }
+        return data.display_name;
+      }
+    }
+    
+    return "Unknown Area";
   } catch (error) {
     console.error("Location identification failed:", error);
     return "United Kingdom";

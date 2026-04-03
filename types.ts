@@ -9,6 +9,34 @@ export interface Hazard {
   imageUrl?: string;
 }
 
+export interface InventoryItem {
+  id: string;
+  room: string;
+  item: string;
+  condition: string;
+  notes: string;
+  photos: string[]; // base64
+  dateAdded: number;
+}
+
+export interface Bill {
+  id: string;
+  title: string;
+  amount: number;
+  dueDate: number;
+  paidBy: string;
+  splitWith: string[];
+  status: 'Pending' | 'Paid';
+}
+
+export interface VaultDocument {
+  id: string;
+  title: string;
+  category: 'ID' | 'Contract' | 'Payslip' | 'Reference' | 'Other';
+  fileData: string; // base64
+  dateAdded: number;
+}
+
 export interface ScanResult {
   isSafe: boolean;
   score: number; // 0-100
@@ -42,6 +70,7 @@ export enum AppTab {
   SCAN = 'scan',
   TRACKER = 'tracker',
   RIGHTS = 'rights',
+  FINANCE = 'finance',
   PROFILE = 'profile'
 }
 
