@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
-import { Loader2, Info } from 'lucide-react';
+import { Loader2, Info, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -9,7 +9,7 @@ interface ButtonProps extends HTMLMotionProps<"button"> {
 
 export const NeuButton: React.FC<ButtonProps> = ({ children, variant = 'primary', isLoading, className, ...props }) => {
   const baseStyle = "relative inline-flex items-center justify-center gap-2 px-6 py-3.5 font-display font-bold text-sm tracking-wide transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none rounded-xl";
-  
+
   const variants = {
     primary: "bg-black text-white dark:bg-white dark:text-black shadow-lg shadow-black/10 hover:bg-gray-900 dark:hover:bg-gray-100",
     secondary: "bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700",
@@ -18,7 +18,7 @@ export const NeuButton: React.FC<ButtonProps> = ({ children, variant = 'primary'
   };
 
   return (
-    <motion.button 
+    <motion.button
       whileTap={{ scale: 0.98 }}
       className={`${baseStyle} ${variants[variant]} ${className || ''}`}
       {...props}
@@ -31,30 +31,45 @@ export const NeuButton: React.FC<ButtonProps> = ({ children, variant = 'primary'
   );
 };
 
-export const SoftCard: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className, onClick }) => (
-  <motion.div 
+export const SoftCard: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}> = ({ children, className, onClick }) => (
+  <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     onClick={onClick}
-    className={`bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 text-black dark:text-white ${className || ''}`}
+    role={onClick ? 'button' : undefined}
+    tabIndex={onClick ? 0 : undefined}
+    onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+    className={`bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 text-black dark:text-white ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-neone-blue' : ''} ${className || ''}`}
   >
     {children}
   </motion.div>
 );
 
-export const NeuAlert: React.FC<{ type: 'danger' | 'info' | 'success'; title: string; children: React.ReactNode }> = ({ type, title, children }) => {
+export const NeuAlert: React.FC<{
+  type: 'danger' | 'info' | 'success';
+  title: string;
+  children: React.ReactNode;
+}> = ({ type, title, children }) => {
   const colors = {
     danger: 'bg-red-50 text-red-900 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30',
     info: 'bg-blue-50 text-blue-900 border-blue-100 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-900/30',
     success: 'bg-emerald-50 text-emerald-900 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/30',
   };
 
+  const icons = {
+    danger: <AlertTriangle aria-hidden="true" size={18} />,
+    success: <ShieldCheck aria-hidden="true" size={18} />,
+    info: <Info aria-hidden="true" size={18} />,
+  };
+
   return (
-    <div className={`${colors[type]} border p-4 rounded-xl flex gap-3 items-start w-full`}>
-      <div className="mt-0.5 flex-shrink-0 text-lg">
-        {type === 'danger' && '⚠️'} 
-        {type === 'success' && '🛡️'}
-        {type === 'info' && 'ℹ️'}
+    <div className={`${colors[type]} border p-4 rounded-xl flex gap-3 items-start w-full`} role="alert">
+      <div className="mt-0.5 flex-shrink-0">
+        {icons[type]}
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-display font-bold text-sm mb-0.5">
@@ -68,19 +83,26 @@ export const NeuAlert: React.FC<{ type: 'danger' | 'info' | 'success'; title: st
 
 export const TooltipIcon: React.FC<{ text: string }> = ({ text }) => {
   const [show, setShow] = React.useState(false);
+  const tooltipId = React.useId();
   return (
     <div className="relative inline-block ml-1">
-      <button 
+      <button
+        aria-label="More information"
+        aria-describedby={show ? tooltipId : undefined}
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
+        onFocus={() => setShow(true)}
+        onBlur={() => setShow(false)}
         onClick={(e) => { e.stopPropagation(); setShow(!show); }}
-        className="p-1 text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+        className="p-1 text-gray-400 hover:text-black dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-neone-blue rounded"
       >
-        <Info size={14} />
+        <Info size={14} aria-hidden="true" />
       </button>
       <AnimatePresence>
         {show && (
           <motion.div
+            id={tooltipId}
+            role="tooltip"
             initial={{ opacity: 0, scale: 0.9, y: 5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 5 }}
