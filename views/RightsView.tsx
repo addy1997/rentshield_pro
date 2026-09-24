@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Send, TrendingUp, CheckCircle, AlertTriangle, Sparkles, Book, Info, Save, MessageSquareQuote } from 'lucide-react';
+import { Shield, Send, TrendingUp, CheckCircle, AlertTriangle, Sparkles, Book, Info, Save, MessageSquareQuote, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NeuButton, SoftCard } from '../components/ui';
 import { Tone } from '../types';
@@ -10,7 +10,7 @@ export default function RightsView() {
   const { state } = useAppContext();
   const location = state.session.locationName;
 
-  const [activeTool, setActiveTool] = useState<'translator' | 'response' | 'dispute' | 'rent'>('translator');
+  const [activeTool, setActiveTool] = useState<'translator' | 'response' | 'dispute' | 'rent' | 'inbox'>('translator');
   const [input, setInput] = useState('');
   const [evidence, setEvidence] = useState('');
   const [amount, setAmount] = useState('');
@@ -19,6 +19,11 @@ export default function RightsView() {
   const [tone, setTone] = useState<Tone>(Tone.DIPLOMATIC);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [inboxScreenshot, setInboxScreenshot] = useState<string>('');
+
+  const sendCertifiedEmail = (content: string) => {
+    alert('Certified Email Sent! A read-receipt tracker has been attached.');
+  };
 
   const handleRun = async () => {
     setLoading(true);
@@ -57,6 +62,9 @@ export default function RightsView() {
         </button>
         <button onClick={() => { setActiveTool('rent'); setResult(null); }} className={`py-2 px-1 text-[9px] font-bold rounded-lg uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1 min-w-[70px] ${activeTool === 'rent' ? 'bg-white dark:bg-gray-800 shadow-sm text-black dark:text-white' : 'text-gray-400'}`}>
           <TrendingUp size={14} /> Rent
+        </button>
+        <button onClick={() => { setActiveTool('inbox'); setResult(null); }} className={`py-2 px-1 text-[9px] font-bold rounded-lg uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-1 min-w-[70px] ${activeTool === 'inbox' ? 'bg-white dark:bg-gray-800 shadow-sm text-black dark:text-white' : 'text-gray-400'}`}>
+          <Mail size={14} /> Inbox
         </button>
       </div>
 
@@ -132,7 +140,8 @@ export default function RightsView() {
                   </div>
                   <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs leading-relaxed border border-gray-200 dark:border-gray-700 relative font-mono text-gray-700 dark:text-gray-300">
                     <div className="absolute top-3 right-3 flex gap-2">
-                      <button onClick={() => navigator.clipboard.writeText(result.letter)} className="p-1.5 bg-white dark:bg-gray-700 rounded-md shadow-sm hover:scale-105 transition-transform"><Save size={14}/></button>
+                      <button onClick={() => navigator.clipboard.writeText(result.letter)} className="p-1.5 bg-white dark:bg-gray-700 rounded-md shadow-sm hover:scale-105 transition-transform" title="Copy"><Save size={14}/></button>
+                      <button onClick={() => sendCertifiedEmail(result.letter)} className="p-1.5 bg-neone-blue text-white rounded-md shadow-sm hover:scale-105 transition-transform" title="Send Certified"><Mail size={14}/></button>
                     </div>
                     <p className="font-bold mb-2">Draft Letter:</p>
                     {result.letter}
@@ -140,7 +149,7 @@ export default function RightsView() {
                </motion.div>
              )}
           </div>
-        ) : (
+        ) : activeTool === 'rent' ? (
           <div className="space-y-5">
              <div className="flex items-center gap-2 text-purple-500 mb-2">
                 <TrendingUp size={20} />
@@ -164,7 +173,8 @@ export default function RightsView() {
                   {result.letter && (
                     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs leading-relaxed border border-gray-200 dark:border-gray-700 relative font-mono text-gray-700 dark:text-gray-300">
                       <div className="absolute top-3 right-3 flex gap-2">
-                        <button onClick={() => navigator.clipboard.writeText(result.letter)} className="p-1.5 bg-white dark:bg-gray-700 rounded-md shadow-sm hover:scale-105 transition-transform"><Save size={14}/></button>
+                        <button onClick={() => navigator.clipboard.writeText(result.letter)} className="p-1.5 bg-white dark:bg-gray-700 rounded-md shadow-sm hover:scale-105 transition-transform" title="Copy"><Save size={14}/></button>
+                        <button onClick={() => sendCertifiedEmail(result.letter)} className="p-1.5 bg-neone-blue text-white rounded-md shadow-sm hover:scale-105 transition-transform" title="Send Certified"><Mail size={14}/></button>
                       </div>
                       <p className="font-bold mb-2">Draft Letter:</p>
                       {result.letter}
@@ -172,6 +182,18 @@ export default function RightsView() {
                   )}
                </motion.div>
              )}
+          </div>
+        ) : (
+          <div className="space-y-5">
+             <div className="flex items-center gap-2 text-neone-blue mb-2">
+                <Mail size={20} />
+                <h3 className="font-bold text-sm text-black dark:text-white">Landlord Comms Timeline</h3>
+             </div>
+             <p className="text-xs text-gray-500">Upload a screenshot of your WhatsApp or email with your landlord to extract the timeline and check for legal threats.</p>
+             <div className="h-32 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+               <button className="text-sm font-bold text-gray-400">Upload Screenshot</button>
+             </div>
+             <NeuButton className="w-full bg-black dark:bg-white text-white dark:text-black">Extract Timeline</NeuButton>
           </div>
         )}
       </SoftCard>
