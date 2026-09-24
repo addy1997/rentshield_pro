@@ -36,7 +36,7 @@ const RegisterView = ({ onRegister }: { onRegister: (user: UserProfile) => void 
   };
 
   return (
-    <div className="h-full bg-white dark:bg-black flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
+    <div className="h-full bg-transparent flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,209,255,0.1),transparent_50%)]" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -166,7 +166,7 @@ const AuthenticatedApp = () => {
   }, [dispatch]);
 
   return (
-    <main className="w-full h-full max-w-md bg-white dark:bg-black shadow-2xl relative overflow-hidden flex flex-col">
+    <main className="w-full h-full max-w-md bg-white/70 dark:bg-gray-900/60 backdrop-blur-2xl shadow-glass relative overflow-hidden flex flex-col border-x border-white/20 dark:border-white/10">
       {!hasSeenOnboarding && (
         <Suspense fallback={null}>
           <OnboardingTour />
@@ -198,7 +198,7 @@ const AuthenticatedApp = () => {
       </div>
 
       {/* Bottom Navigation — 6 tabs with Finance */}
-      <div className="absolute bottom-0 left-0 w-full bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 z-50 h-[84px] pb-6 pt-2 px-2 shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+      <div className="absolute bottom-0 left-0 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-white/40 dark:border-white/10 z-50 h-[84px] pb-6 pt-2 px-2 shadow-[0_-8px_32px_rgba(31,38,135,0.07)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.3)]">
         <div className="grid grid-cols-6 h-full items-end">
           <NavItem tab={AppTab.OVERVIEW} icon={HomeIcon} label="Home" />
           <NavItem tab={AppTab.TRACKER} icon={AlertTriangle} label="Hazards" badge={unresolvedHazards > 0} />
@@ -237,9 +237,9 @@ const AppInner = () => {
   };
 
   return (
-    <div className="h-full w-full flex justify-center bg-gray-100 dark:bg-neutral-900 transition-all duration-300">
+    <div className="h-full w-full flex justify-center bg-transparent transition-all duration-300">
       {!isAuthenticated ? (
-        <main className="w-full h-full max-w-md bg-white dark:bg-black shadow-2xl relative overflow-hidden flex flex-col">
+        <main className="w-full h-full max-w-md bg-white/70 dark:bg-gray-900/60 backdrop-blur-2xl shadow-glass relative overflow-hidden flex flex-col border-x border-white/20 dark:border-white/10">
           <RegisterView onRegister={handleRegister} />
         </main>
       ) : (

@@ -11,10 +11,10 @@ export const NeuButton: React.FC<ButtonProps> = ({ children, variant = 'primary'
   const baseStyle = "relative inline-flex items-center justify-center gap-2 px-6 py-3.5 font-display font-bold text-sm tracking-wide transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none rounded-xl";
 
   const variants = {
-    primary: "bg-black text-white dark:bg-white dark:text-black shadow-lg shadow-black/10 hover:bg-gray-900 dark:hover:bg-gray-100",
-    secondary: "bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700",
-    danger: "bg-neone-red text-white shadow-lg shadow-neone-red/20 hover:brightness-110",
-    ghost: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+    primary: "bg-gradient-to-r from-neone-blue to-purple-500 text-white shadow-lg shadow-neone-blue/30 hover:shadow-neone-blue/50 hover:brightness-110 dark:from-neone-blue dark:to-purple-600 border border-white/20",
+    secondary: "bg-white/50 dark:bg-gray-800/50 backdrop-blur-md text-black dark:text-white border border-white/40 dark:border-white/10 shadow-sm hover:bg-white/70 dark:hover:bg-gray-700/60",
+    danger: "bg-gradient-to-r from-neone-red to-pink-500 text-white shadow-lg shadow-neone-red/30 hover:shadow-neone-red/50 hover:brightness-110 border border-white/20",
+    ghost: "text-gray-600 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 backdrop-blur-sm"
   };
 
   return (
@@ -43,7 +43,7 @@ export const SoftCard: React.FC<{
     role={onClick ? 'button' : undefined}
     tabIndex={onClick ? 0 : undefined}
     onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
-    className={`bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 text-black dark:text-white ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-neone-blue' : ''} ${className || ''}`}
+    className={`bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl rounded-2xl p-5 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/40 dark:border-white/10 text-black dark:text-white transition-all hover:bg-white/80 dark:hover:bg-gray-900/80 ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-neone-blue' : ''} ${className || ''}`}
   >
     {children}
   </motion.div>
@@ -55,9 +55,9 @@ export const NeuAlert: React.FC<{
   children: React.ReactNode;
 }> = ({ type, title, children }) => {
   const colors = {
-    danger: 'bg-red-50 text-red-900 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30',
-    info: 'bg-blue-50 text-blue-900 border-blue-100 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-900/30',
-    success: 'bg-emerald-50 text-emerald-900 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/30',
+    danger: 'bg-red-500/10 text-red-900 border-red-500/20 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/40 backdrop-blur-md',
+    info: 'bg-blue-500/10 text-blue-900 border-blue-500/20 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/40 backdrop-blur-md',
+    success: 'bg-emerald-500/10 text-emerald-900 border-emerald-500/20 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/40 backdrop-blur-md',
   };
 
   const icons = {
