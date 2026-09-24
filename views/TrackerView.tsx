@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { NeuButton, SoftCard, NeuAlert } from '../components/ui';
 import { AppTab, Hazard, InventoryItem } from '../types';
 import { useAppContext } from '../context/AppContext';
-import { analyzeHazard, identifyLocation } from '../services/geminiService';
+import { analyzeHazard } from '../services/geminiService';
 import { format } from 'date-fns';
 
 export default function TrackerView() {
@@ -20,7 +20,6 @@ export default function TrackerView() {
   const fileRef = useRef<HTMLInputElement>(null);
   const invFileRef = useRef<HTMLInputElement>(null);
   const [selectedHazard, setSelectedHazard] = useState<Hazard | null>(null);
-  const [isListening, setIsListening] = useState(false);
 
   const handleCaptureHazard = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,50 +64,6 @@ export default function TrackerView() {
     reader.readAsDataURL(file);
   };
 
-  const startVoiceLogging = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in this browser.');
-      return;
-    }
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-GB';
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onerror = () => setIsListening(false);
-    
-    recognition.onresult = async (event: any) => {
-      setIsListening(false);
-      const transcript = event.results[0][0].transcript;
-      setAnalyzing(true);
-      
-      const newHazard: Hazard = {
-        id: Date.now().toString(),
-        type: "Voice Logged Hazard",
-        description: transcript,
-        severity: "Medium",
-        dateReported: Date.now(),
-        status: 'Reported'
-      };
-      dispatch({ type: 'ADD_HAZARD', payload: newHazard });
-      dispatch({
-        type: 'ADD_ACTIVITY',
-        payload: {
-          id: Date.now().toString(),
-          title: `Hazard: Voice Logged`,
-          time: Date.now(),
-          iconName: 'AlertTriangle',
-          color: 'text-neone-red'
-        }
-      });
-      setAnalyzing(false);
-    };
-
-    recognition.start();
-  };
-
   const submitInventory = () => {
     if (!invForm.room || !invForm.item) return;
     const newItem: InventoryItem = {
@@ -140,16 +95,7 @@ export default function TrackerView() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-display font-bold">Property Tracker</h2>
         {activeTab === 'hazards' ? (
-          <div className="flex gap-2">
-            <NeuButton variant="secondary" className={`h-10 px-4 text-xs flex gap-2 items-center ${isListening ? 'bg-red-50 text-red-500 animate-pulse' : ''}`} onClick={startVoiceLogging}>
-              <span className="relative flex h-3 w-3">
-                {isListening && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
-                <span className={`relative inline-flex rounded-full h-3 w-3 ${isListening ? 'bg-red-500' : 'bg-gray-400'}`}></span>
-              </span>
-              Voice Log
-            </NeuButton>
-            <NeuButton variant="danger" className="h-10 px-4 text-xs" onClick={() => fileRef.current?.click()}>+ Photo</NeuButton>
-          </div>
+          <NeuButton variant="danger" className="h-10 px-4 text-xs" onClick={() => fileRef.current?.click()}>+ Log Hazard</NeuButton>
         ) : (
           <NeuButton className="h-10 px-4 text-xs bg-neone-blue" onClick={() => setAddingInventory(true)}>+ Add Item</NeuButton>
         )}
@@ -295,9 +241,9 @@ export default function TrackerView() {
 
                 <div className="flex items-center gap-2">
                   <button onClick={() => invFileRef.current?.click()} className="flex-1 p-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
-                    <Camera size={16} /> {invForm.photo ? 'Change Media' : 'AR/Video Scan'}
+                    <Camera size={16} /> {invForm.photo ? 'Change Photo' : 'Take Photo'}
                   </button>
-                  <input ref={invFileRef} type="file" accept="image/*,video/*" capture="environment" className="hidden" onChange={handleCaptureInventory} />
+                  <input ref={invFileRef} type="file" accept="image/*" className="hidden" onChange={handleCaptureInventory} />
                 </div>
                 {invForm.photo && (
                   <div className="w-full h-32 rounded-xl overflow-hidden">

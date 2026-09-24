@@ -265,28 +265,15 @@ export const analyzeRentIncrease = async (
   try {
     return await withRetry(async () => {
       const ai = getAI();
-      
-      // Simulate fetching real-time market data from an API like Zoopla or Rightmove
-      const mockMarketData = {
-        averageRent: currentRent * 1.05,
-        inflationRate: '3.2%',
-        demandIndex: 'High',
-      };
-
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `Current Rent: £${currentRent}.
 Proposed Rent: £${newRent}.
 Location: ${location}.
 
-Real-Time Market Data for this area:
-- Average Local Rent: £${mockMarketData.averageRent.toFixed(2)}
-- UK Inflation Rate: ${mockMarketData.inflationRate}
-- Demand: ${mockMarketData.demandIndex}
-
 Task:
 1. Calculate the percentage increase.
-2. Cross-reference the proposed rent with the real-time market average. Is this excessive?
+2. Based on general UK inflation/market trends for 2026, is this excessive?
 3. Draft a "Section 13 Rejection Letter" if it's too high, or a negotiation letter if moderate.
 
 Return JSON:
