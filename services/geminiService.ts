@@ -410,3 +410,45 @@ export const identifyLocation = async (lat: number, lng: number): Promise<string
     return "United Kingdom";
   }
 };
+
+export const benchmarkRent = async (
+  postcode: string,
+  rentAmount: number
+): Promise<{ averageRent: number; isOvercharging: boolean; summary: string }> => {
+  try {
+    return await withRetry(async () => {
+      const ai = getAI();
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: `Analyze the rent affordability for the UK postcode: ${postcode}.
+The user is paying or quoted £${rentAmount} per month.
+Estimate the average market rent for a standard 1-bed/2-bed property in this specific postcode area using your knowledge of UK rental markets.
+Determine if the user is being overcharged compared to the local average.
+
+Return JSON:
+{
+  "averageRent": number (estimated average rent in GBP),
+  "isOvercharging": boolean (true if rentAmount is significantly higher than averageRent),
+  "summary": string (short explanation and negotiation advice)
+}`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              averageRent: { type: Type.NUMBER },
+              isOvercharging: { type: Type.BOOLEAN },
+              summary: { type: Type.STRING }
+            }
+          }
+        }
+      });
+      const text = response.text;
+      if (!text) throw new Error("No response");
+      return JSON.parse(text);
+    });
+  } catch (e) {
+    console.error("Rent Benchmark API Error:", e);
+    return { averageRent: 0, isOvercharging: false, summary: "Could not fetch local benchmark data. Please ensure VITE_GEMINI_API_KEY is set in .env.local." };
+  }
+};

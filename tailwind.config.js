@@ -13,16 +13,15 @@ export default {
         display: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
-        'neone-red': '#FF4D4D',
-        'neone-blue': '#00D1FF',
+        'neone-red': '#FF2A5F',
+        'neone-blue': '#00F0FF',
         'neone-yellow': '#FFD166',
-        'neone-green': '#06D6A0',
-        'neone-dark': '#1A1A1A',
+        'neone-green': '#00F5D4',
+        'neone-dark': '#0B0F19',
       },
       boxShadow: {
-        'neu': '4px 4px 0px 0px rgba(0,0,0,1)',
-        'neu-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
-        'neu-white': '4px 4px 0px 0px rgba(255,255,255,1)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'glass-sm': '0 4px 16px 0 rgba(31, 38, 135, 0.37)',
       }
     }
   },
