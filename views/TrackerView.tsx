@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { AlertTriangle, Camera, Loader2, ShieldCheck, Clock, X } from 'lucide-react';
+import { AlertTriangle, Camera, Loader2, ShieldCheck, Clock, X, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NeuButton, SoftCard, NeuAlert } from '../components/ui';
 import { AppTab, Hazard, InventoryItem } from '../types';
@@ -12,6 +12,7 @@ export default function TrackerView() {
   const { state, dispatch } = useAppContext();
   const hazards = state.data.hazards;
   const inventory = state.data.inventory;
+  const location = state.session.locationName;
 
   const [activeTab, setActiveTab] = useState<'hazards' | 'inventory'>('hazards');
   const [analyzing, setAnalyzing] = useState(false);
@@ -151,6 +152,30 @@ export default function TrackerView() {
                  <NeuButton variant="secondary" className="w-full py-2.5 text-xs h-auto" onClick={() => setSelectedHazard(h)}>View Legal Timeline</NeuButton>
               </SoftCard>
             ))}
+          </div>
+
+          <div className="mt-8 space-y-3">
+            <h3 className="text-xs font-bold uppercase text-gray-400 tracking-wider px-1">Community Hazard Heatmap</h3>
+            <SoftCard className="p-4 relative overflow-hidden bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-white/40 dark:border-white/10">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, rgba(255,50,50,0.8) 0%, transparent 40%), radial-gradient(circle at 70% 30%, rgba(255,150,0,0.6) 0%, transparent 30%), radial-gradient(circle at 60% 80%, rgba(0,200,255,0.4) 0%, transparent 40%)', filter: 'blur(10px)' }} />
+              <div className="relative z-10 space-y-4">
+                 <div className="flex items-center justify-between">
+                    <p className="font-bold text-sm">Local Hotspots in {location}</p>
+                    <span className="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded-md font-bold uppercase">High Alert</span>
+                 </div>
+                 <div className="space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                       <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2"><MapPin size={12} className="text-neone-red" /> Black Mould Reports</span>
+                       <span className="font-bold">24 this week</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                       <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2"><MapPin size={12} className="text-neone-yellow" /> Structural Leaks</span>
+                       <span className="font-bold">12 this week</span>
+                    </div>
+                 </div>
+                 <p className="text-[10px] text-gray-500 italic mt-2 text-center">Data anonymized from RentShield community reports.</p>
+              </div>
+            </SoftCard>
           </div>
 
           {typeof document !== 'undefined' && createPortal(

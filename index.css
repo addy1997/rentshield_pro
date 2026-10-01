@@ -1,9 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "./tailwind.config.js";
 
 body {
-  background-color: #f0f2f5;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   margin: 0;
   padding: 0;
   width: 100vw;
@@ -12,7 +11,7 @@ body {
 }
 
 .dark body {
-  background-color: #111;
+  background: linear-gradient(135deg, #0B0F19 0%, #1A1A2E 100%);
 }
 
 #root {

@@ -10,6 +10,8 @@ interface UserProfile {
   lastName: string;
   age: string;
   mobile: string;
+  email?: string;
+  password?: string;
   avatar?: string;
 }
 
